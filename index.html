@@ -73,8 +73,8 @@ button:active { transform: scale(.98); }
         </radialGradient>
         <radialGradient id="rimGradient">
           <stop offset=".42" stop-color="#fff" stop-opacity="0"/>
-          <stop offset=".62" stop-color="#f2eee6" stop-opacity=".38"/>
-          <stop offset=".82" stop-color="#fff" stop-opacity="0"/>
+          <stop offset=".48" stop-color="#f2eee6" stop-opacity=".38"/>
+          <stop offset=".72" stop-color="#fff" stop-opacity="0"/>
         </radialGradient>
         <filter id="squish" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
           <feImage id="mapImage" result="map" x="0" y="0" width="300" height="300" preserveAspectRatio="none"/>
@@ -110,7 +110,7 @@ button:active { transform: scale(.98); }
   const hint = document.getElementById('hint');
   const reset = document.getElementById('reset');
 
-  const W = 300, H = 300, SCALE = 44, RADIUS = 76;
+  const W = 300, H = 300, SCALE = 44, RADIUS = 55;
   const mapCanvas = document.createElement('canvas');
   mapCanvas.width = W; mapCanvas.height = H;
   const mapCtx = mapCanvas.getContext('2d', { willReadFrequently: true });
