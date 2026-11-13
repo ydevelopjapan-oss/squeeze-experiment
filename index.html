@@ -395,8 +395,7 @@ button:active {
   reset.addEventListener('click', () => {
     release();
   });
-})();
-const pressureReadout =
+  const pressureReadout =
   document.getElementById('pressureReadout');
 
 let pressStartTime = 0;
@@ -433,6 +432,8 @@ pad.addEventListener('pointercancel', () => {
   pressStartTime = 0;
   pressureReadout.textContent = '入力がキャンセルされました';
 });
+})();
+
 
 </script>
 </body>
