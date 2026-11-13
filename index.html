@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>スクイーズ実験</title>
+<title>布クッション実験</title>
 
 <style>
 :root {
@@ -26,7 +26,7 @@ body {
   padding: 24px 16px;
   background: #f4f1eb;
   color: #4d4b48;
-  font-family: system-ui, -apple-system, "Hiragino Kaku Gothic ProN", sans-serif;
+  font-family: system-ui, -apple-system, sans-serif;
   touch-action: manipulation;
 }
 
@@ -37,8 +37,6 @@ main {
 
 h1 {
   font-size: 21px;
-  font-weight: 650;
-  letter-spacing: .04em;
   margin: 0 0 8px;
 }
 
@@ -51,15 +49,15 @@ h1 {
 .pad {
   position: relative;
   width: 100%;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 1;
   display: grid;
   place-items: center;
   border-radius: 28px;
   background: linear-gradient(145deg,#fffefa,#e9e4da);
-  box-shadow: inset 0 2px 8px #ffffff, 0 12px 30px #6c62501c;
+  box-shadow: inset 0 2px 8px #fff,
+              0 12px 30px #6c62501c;
   overflow: hidden;
   touch-action: none;
-  user-select: none;
   cursor: grab;
 }
 
@@ -74,8 +72,11 @@ svg {
   pointer-events: none;
 }
 
-#piece {
-  transform-origin: 150px 150px;
+#cushion {
+  fill: url(#fabricGradient);
+  stroke: rgba(90,65,65,.14);
+  stroke-width: 1.5;
+  filter: url(#shadow);
 }
 
 #dent {
@@ -83,12 +84,10 @@ svg {
   pointer-events: none;
 }
 
-#dentShade {
-  fill: url(#dentGradient);
-}
-
-#dentRim {
-  fill: url(#rimGradient);
+#wrinkles path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .hint {
@@ -116,72 +115,76 @@ button {
 button:active {
   transform: scale(.98);
 }
-#pressureReadout {
-  position: absolute;
-  left: 10px;
-  bottom: 10px;
-  z-index: 10;
-  padding: 8px 12px;
-  border-radius: 10px;
-  background: rgba(255,255,255,0.9);
-  color: #594b4b;
-  font-size: 12px;
-  line-height: 1.6;
-  pointer-events: none;
-}
 </style>
 </head>
 
 <body>
 <main>
-  <h1>スクイーズ実験</h1>
-  <p class="lead">本編と同じ5個のクッションで、押したときの変形を試します</p>
+  <h1>布クッション実験</h1>
+  <p class="lead">指で押して、布のシワと凹みを試します</p>
 
-  <div class="pad" id="pad" aria-label="押して変形させるエリア">
-
-    <svg viewBox="0 0 300 300" role="img" aria-label="5マスの柔らかいピース">
+  <div class="pad" id="pad">
+    <svg viewBox="0 0 300 300">
 
       <defs>
-        <radialGradient id="dentGradient">
-          <stop offset="0" stop-color="#603b40" stop-opacity=".75"/>
-          <stop offset=".34" stop-color="#854d52" stop-opacity=".45"/>
-          <stop offset=".72" stop-color="#a96668" stop-opacity=".10"/>
-          <stop offset="1" stop-color="#a96668" stop-opacity="0"/>
-        </radialGradient>
+        <linearGradient id="fabricGradient"
+          x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#f6b3aa"/>
+          <stop offset=".48" stop-color="#e99b91"/>
+          <stop offset="1" stop-color="#d77f7a"/>
+        </linearGradient>
+
+<radialGradient id="dentGradient">
+  <stop offset="0" stop-color="#804f53" stop-opacity=".22"/>
+  <stop offset=".25" stop-color="#92575b" stop-opacity=".28"/>
+  <stop offset=".55" stop-color="#a96668" stop-opacity=".16"/>
+  <stop offset=".82" stop-color="#b77b79" stop-opacity=".06"/>
+  <stop offset="1" stop-color="#b77b79" stop-opacity="0"/>
+</radialGradient>
 
         <radialGradient id="rimGradient">
-          <stop offset=".35" stop-color="#fff" stop-opacity="0"/>
-          <stop offset=".50" stop-color="#f2eee6" stop-opacity=".38"/>
-          <stop offset=".82" stop-color="#fff" stop-opacity="0"/>
+          <stop offset=".45" stop-color="#fff" stop-opacity="0"/>
+          <stop offset=".68" stop-color="#fff0e9" stop-opacity=".45"/>
+          <stop offset="1" stop-color="#fff" stop-opacity="0"/>
         </radialGradient>
 
-        <filter id="cellShadow" x="-30%" y="-30%" width="170%" height="170%">
-          <feDropShadow
-            dx="3.36"
-            dy="3.36"
-            stdDeviation="3.84"
-            flood-color="rgb(70,75,85)"
+        <filter id="shadow" x="-30%" y="-30%" width="170%" height="170%">
+          <feDropShadow dx="3.3" dy="3.3"
+            stdDeviation="3.8"
+            flood-color="#464b55"
             flood-opacity=".22"/>
         </filter>
+
+        <clipPath id="cushionClip">
+          <rect x="70" y="70" width="160" height="160" rx="48"/>
+        </clipPath>
       </defs>
 
-      <g id="piece">
-        <g id="pieceCells"></g>
+      <!-- クッション本体 -->
+      <rect id="cushion"
+        x="70" y="70"
+        width="160" height="160"
+        rx="48"/>
 
-        <g id="dent">
-          <circle id="dentShade" cx="150" cy="130" r="72"/>
-          <circle id="dentRim" cx="150" cy="130" r="84"/>
-        </g>
+      <!-- 凹みとシワ -->
+      <g id="dent" clip-path="url(#cushionClip)">
+
+        <circle id="dentShade"
+          cx="150" cy="150" r="78"
+          fill="url(#dentGradient)"/>
+
+        <circle id="dentRim"
+          cx="150" cy="150" r="88"
+          fill="url(#rimGradient)"/>
+
+        <g id="wrinkles"></g>
       </g>
 
     </svg>
-<div id="pressureReadout">
-  指で押してみてね
-</div>
   </div>
 
-  <p class="hint" id="hint">ピースを指で押してみてね</p>
-  <p class="sub">押している間だけスクイーズし、指を離すと元に戻ります</p>
+  <p class="hint" id="hint">クッションを指で押してみてね</p>
+  <p class="sub">指を離すと、ゆっくり元に戻ります</p>
 
   <button id="reset" type="button">元の形に戻す</button>
 </main>
@@ -189,147 +192,199 @@ button:active {
 <script>
 (() => {
   const pad = document.getElementById('pad');
-  const pieceCells = document.getElementById('pieceCells');
   const dent = document.getElementById('dent');
   const shade = document.getElementById('dentShade');
   const rim = document.getElementById('dentRim');
+  const wrinkles = document.getElementById('wrinkles');
   const hint = document.getElementById('hint');
   const reset = document.getElementById('reset');
-
-  // 本編 drawPiece() と同じクッション設定
-  const size = 48;
-  const originX = 78;
-  const originY = 78;
-
-  const protrude = size * 0.3;
-  const seam = size * 0.02;
-  const radius = size * 0.4;
-
-  const cells = [
-    [0, 0],
-    [1, 0],
-    [2, 0],
-    [1, 1],
-    [1, 2]
-  ];
+  const svg = pad.querySelector('svg');
 
   const NS = 'http://www.w3.org/2000/svg';
 
-  function lightenColor(hex, amount) {
-    return adjustColor(hex, amount);
-  }
-
-  function darkenColor(hex, amount) {
-    return adjustColor(hex, -amount);
-  }
-
-  function adjustColor(hex, amount) {
-    const num = parseInt(hex.replace('#', ''), 16);
-
-    const r = Math.max(0, Math.min(255, (num >> 16) + amount));
-    const g = Math.max(0, Math.min(255, ((num >> 8) & 255) + amount));
-    const b = Math.max(0, Math.min(255, (num & 255) + amount));
-
-    return `rgb(${r}, ${g}, ${b})`;
-  }
-
-  // クッションを本編と同じ順番で描画
-  function drawCells() {
-    const color = '#e99b91';
-
-    const drawOrder = [...cells].sort((a, b) => {
-      const da = a[0] + a[1];
-      const db = b[0] + b[1];
-
-      if (da !== db) return da - db;
-      if (a[1] !== b[1]) return a[1] - b[1];
-      return a[0] - b[0];
-    });
-
-    drawOrder.forEach(([cx, cy], index) => {
-      const px = originX + cx * size - protrude;
-      const py = originY + cy * size - protrude;
-
-      const w = size + protrude - seam;
-      const h = size + protrude - seam;
-
-      const gradientId = `cellGradient${index}`;
-
-      const gradient = document.createElementNS(NS, 'linearGradient');
-      gradient.setAttribute('id', gradientId);
-      gradient.setAttribute('gradientUnits', 'userSpaceOnUse');
-      gradient.setAttribute('x1', px);
-      gradient.setAttribute('y1', py);
-      gradient.setAttribute('x2', px + w);
-      gradient.setAttribute('y2', py + h);
-
-      const stops = [
-        [0, lightenColor(color, 30)],
-        [.5, color],
-        [1, darkenColor(color, 18)]
-      ];
-
-      stops.forEach(([offset, stopColor]) => {
-        const stop = document.createElementNS(NS, 'stop');
-        stop.setAttribute('offset', offset);
-        stop.setAttribute('stop-color', stopColor);
-        gradient.appendChild(stop);
-      });
-
-      document.querySelector('defs').appendChild(gradient);
-
-      const group = document.createElementNS(NS, 'g');
-
-      const rect = document.createElementNS(NS, 'rect');
-      rect.setAttribute('x', px);
-      rect.setAttribute('y', py);
-      rect.setAttribute('width', w);
-      rect.setAttribute('height', h);
-      rect.setAttribute('rx', radius);
-      rect.setAttribute('fill', `url(#${gradientId})`);
-      rect.setAttribute('stroke', 'rgba(90,85,80,0.13)');
-      rect.setAttribute('stroke-width', Math.max(0.7, size * 0.025));
-      rect.setAttribute('filter', 'url(#cellShadow)');
-
-      group.appendChild(rect);
-
-      // 左上側の柔らかい光沢
-      const highlight = document.createElementNS(NS, 'path');
-
-      highlight.setAttribute(
-        'd',
-        `M ${px + radius} ${py + 2}
-         H ${px + w - radius}
-         M ${px + 2} ${py + radius}
-         V ${py + h - radius}`
-      );
-
-      highlight.setAttribute('fill', 'none');
-      highlight.setAttribute('stroke', 'rgba(255,255,255,0.42)');
-      highlight.setAttribute('stroke-width', Math.max(1, size * 0.035));
-      highlight.setAttribute('stroke-linecap', 'round');
-
-      group.appendChild(highlight);
-      pieceCells.appendChild(group);
-    });
-  }
-
-  drawCells();
-
   let active = false;
-  let point = null;
   let pointerId = null;
+  let point = null;
+
+  let depth = 0;
+  let startTime = 0;
+  let releaseStart = 0;
+  let releaseFrom = 0;
+  let animationId = null;
+  let releasing = false;
+
+  // 凹みが立ち上がる速さ
+  const PRESS_SPEED = 0.065;
+
+  // 戻る時間
+  const RELEASE_DURATION = 520;
+
+  // 凹みの最大値
+  const MAX_DEPTH = 1;
 
   function localPoint(e) {
-    const svg = pad.querySelector('svg');
     const p = svg.createSVGPoint();
-
     p.x = e.clientX;
     p.y = e.clientY;
 
-    const q = p.matrixTransform(svg.getScreenCTM().inverse());
+    const q = p.matrixTransform(
+      svg.getScreenCTM().inverse()
+    );
 
     return { x: q.x, y: q.y };
+  }
+
+  function insideCushion(p) {
+    return p.x >= 70 && p.x <= 230 &&
+           p.y >= 70 && p.y <= 230;
+  }
+
+  // 放射状のシワを作る
+    // 布が自然に寄る放射状のシワ
+  function drawWrinkles(x, y, amount) {
+    wrinkles.innerHTML = '';
+
+    // 角度・長さ・曲がり方を不揃いにする
+    const folds = [
+      { angle: -2.0, length: 53, bend:  8 },
+      { angle: -1.25, length: 42, bend: -6 },
+      { angle: -0.55, length: 66, bend:  9 },
+      { angle:  0.25, length: 49, bend: -8 },
+      { angle:  0.95, length: 61, bend:  7 },
+      { angle:  1.75, length: 45, bend: -9 },
+      { angle:  2.45, length: 58, bend:  6 },
+      { angle:  3.05, length: 43, bend: -7 }
+    ];
+
+    folds.forEach((fold, i) => {
+      const a = fold.angle;
+      const dx = Math.cos(a);
+      const dy = Math.sin(a);
+
+      const nx = -dy;
+      const ny = dx;
+
+      const start = 20;
+      const end = fold.length;
+
+      const sx = x + dx * start;
+      const sy = y + dy * start;
+
+      const ex = x + dx * end;
+      const ey = y + dy * end;
+
+      const bend = fold.bend;
+
+      const c1x = x + dx * 34 + nx * bend;
+      const c1y = y + dy * 34 + ny * bend;
+
+      const c2x = x + dx * (end - 13) + nx * bend * .65;
+      const c2y = y + dy * (end - 13) + ny * bend * .65;
+
+      const d =
+        `M ${sx} ${sy}
+         C ${c1x} ${c1y},
+           ${c2x} ${c2y},
+           ${ex} ${ey}`;
+
+      // 布が盛り上がる幅のある部分
+      const soft = document.createElementNS(NS, 'path');
+      soft.setAttribute('d', d);
+      soft.setAttribute('stroke', '#a96366');
+      soft.setAttribute('stroke-width', 7 * amount);
+      soft.setAttribute('stroke-opacity', .13 * amount);
+
+      // 折れ目の暗い谷
+      const dark = document.createElementNS(NS, 'path');
+      dark.setAttribute('d', d);
+      dark.setAttribute('stroke', '#82484e');
+      dark.setAttribute('stroke-width', 2.1 * amount);
+      dark.setAttribute('stroke-opacity', .34 * amount);
+
+      // 谷の隣にできる柔らかい光
+      const light = document.createElementNS(NS, 'path');
+
+      const offset = 2.5;
+
+      const ld =
+        `M ${sx + nx * offset} ${sy + ny * offset}
+         C ${c1x + nx * offset} ${c1y + ny * offset},
+           ${c2x + nx * offset} ${c2y + ny * offset},
+           ${ex + nx * offset} ${ey + ny * offset}`;
+
+      light.setAttribute('d', ld);
+      light.setAttribute('stroke', '#fff1e9');
+      light.setAttribute('stroke-width', 1.8 * amount);
+      light.setAttribute('stroke-opacity', .48 * amount);
+
+      wrinkles.appendChild(soft);
+      wrinkles.appendChild(dark);
+      wrinkles.appendChild(light);
+    });
+  }
+
+  function updateVisual() {
+    if (!point || depth <= 0.001) {
+      dent.style.opacity = '0';
+      return;
+    }
+
+    dent.style.opacity = String(depth);
+
+    shade.setAttribute('cx', point.x);
+    shade.setAttribute('cy', point.y);
+    shade.setAttribute('r', 38 + depth * 42);
+
+    rim.setAttribute('cx', point.x);
+    rim.setAttribute('cy', point.y);
+    rim.setAttribute('r', 48 + depth * 42);
+
+    drawWrinkles(point.x, point.y, depth);
+  }
+
+  function animate(now) {
+    if (active) {
+      // 押した直後に急激に深くなり、その後は一定
+      const elapsed = (now - startTime) / 1000;
+
+      depth = MAX_DEPTH *
+        (1 - Math.exp(-elapsed / PRESS_SPEED));
+
+      depth = Math.min(depth, MAX_DEPTH);
+    }
+
+    if (releasing) {
+      const t = Math.min(
+        1,
+        (now - releaseStart) / RELEASE_DURATION
+      );
+
+      // 自然にゆっくり戻る
+      const eased = 1 - Math.pow(1 - t, 3);
+
+      depth = releaseFrom * (1 - eased);
+
+      if (t >= 1) {
+        depth = 0;
+        releasing = false;
+        point = null;
+        hint.textContent = '元の形に戻ったよ';
+      }
+    }
+
+    updateVisual();
+
+    if (active || releasing) {
+      animationId = requestAnimationFrame(animate);
+    } else {
+      animationId = null;
+    }
+  }
+
+  function startAnimation() {
+    if (animationId === null) {
+      animationId = requestAnimationFrame(animate);
+    }
   }
 
   function press(e) {
@@ -337,18 +392,21 @@ button:active {
 
     const p = localPoint(e);
 
-    // ピース付近を押したときだけ反応
-    if (p.x < 60 || p.x > 240 || p.y < 60 || p.y > 240) return;
+    if (!insideCushion(p)) return;
 
     active = true;
+    releasing = false;
     pointerId = e.pointerId;
 
     pad.setPointerCapture(pointerId);
 
     point = p;
-    update();
+    depth = 0;
+    startTime = performance.now();
 
-    hint.textContent = 'むにゅっ… 指を動かしてみて';
+    hint.textContent = 'むにゅっ…';
+
+    startAnimation();
   }
 
   function move(e) {
@@ -357,31 +415,21 @@ button:active {
     e.preventDefault();
 
     point = localPoint(e);
-    update();
+    updateVisual();
   }
 
   function release(e) {
-    if (!active || (e && e.pointerId !== pointerId)) return;
+    if (!active) return;
+    if (e && e.pointerId !== pointerId) return;
 
     active = false;
     pointerId = null;
-    point = null;
 
-    dent.style.opacity = '0';
+    releasing = true;
+    releaseStart = performance.now();
+    releaseFrom = depth;
 
-    hint.textContent = '元の形に戻ったよ';
-  }
-
-  function update() {
-    if (!point) return;
-
-    dent.style.opacity = '.95';
-
-    shade.setAttribute('cx', point.x);
-    shade.setAttribute('cy', point.y);
-
-    rim.setAttribute('cx', point.x);
-    rim.setAttribute('cy', point.y);
+    startAnimation();
   }
 
   pad.addEventListener('pointerdown', press);
@@ -393,48 +441,19 @@ button:active {
   pad.addEventListener('dragstart', e => e.preventDefault());
 
   reset.addEventListener('click', () => {
-    release();
+    if (active) {
+      active = false;
+      pointerId = null;
+    }
+
+    releasing = true;
+    releaseStart = performance.now();
+    releaseFrom = depth;
+
+    startAnimation();
   });
-  const pressureReadout =
-  document.getElementById('pressureReadout');
 
-let pressStartTime = 0;
-
-function showPressure(e) {
-  const pressure = e.pressure;
-  const elapsed = pressStartTime
-    ? (performance.now() - pressStartTime) / 1000
-    : 0;
-
-  pressureReadout.innerHTML =
-    `入力方式：${e.pointerType}<br>` +
-    `圧力値：${pressure.toFixed(3)}<br>` +
-    `経過時間：${elapsed.toFixed(2)} 秒`;
-}
-
-pad.addEventListener('pointerdown', e => {
-  pressStartTime = performance.now();
-  showPressure(e);
-});
-
-pad.addEventListener('pointermove', e => {
-  if (e.buttons) {
-    showPressure(e);
-  }
-});
-
-pad.addEventListener('pointerup', e => {
-  showPressure(e);
-  pressStartTime = 0;
-});
-
-pad.addEventListener('pointercancel', () => {
-  pressStartTime = 0;
-  pressureReadout.textContent = '入力がキャンセルされました';
-});
 })();
-
-
 </script>
 </body>
 </html>
