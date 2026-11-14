@@ -223,26 +223,57 @@ button:active {
   }
 
  
+
 function drawWrinkles(x, y, amount) {
   wrinkles.innerHTML = '';
 
-  // 放射状に広がる8本のシワ
-  // 長さと角度は少しずつ不揃いにする
   const folds = [
-    { angle: -2.0,  length: 49, bend:  3 },
-    { angle: -1.25, length: 43, bend: -3 },
-    { angle: -0.55, length: 57, bend:  4 },
-    { angle:  0.25, length: 46, bend: -3 },
-    { angle:  0.95, length: 55, bend:  3 },
-    { angle:  1.75, length: 44, bend: -4 },
-    { angle:  2.45, length: 53, bend:  3 },
-    { angle:  3.05, length: 45, bend: -3 }
+    { angle: -2.05, length: 48, bend:  4 },
+    { angle: -1.05, length: 57, bend: -3 },
+    { angle: -0.12, length: 45, bend:  5 },
+    { angle:  0.82, length: 62, bend: -4 },
+    { angle:  1.82, length: 51, bend:  3 },
+    { angle:  2.75, length: 57, bend: -4 }
   ];
+
+  // 曲線に沿って、根元から先端へ細くなる形を作る
+  function taperedShape(points, startWidth, endWidth) {
+    const left = [];
+    const right = [];
+
+    points.forEach((p, i) => {
+      const t = i / (points.length - 1);
+      const width = startWidth +
+        (endWidth - startWidth) * t;
+
+      const prev = points[Math.max(0, i - 1)];
+      const next = points[Math.min(points.length - 1, i + 1)];
+
+      const dx = next.x - prev.x;
+      const dy = next.y - prev.y;
+      const len = Math.hypot(dx, dy) || 1;
+
+      const nx = -dy / len;
+      const ny = dx / len;
+
+      left.push({
+        x: p.x + nx * width / 2,
+        y: p.y + ny * width / 2
+      });
+
+      right.push({
+        x: p.x - nx * width / 2,
+        y: p.y - ny * width / 2
+      });
+    });
+
+    const all = [...left, ...right.reverse()];
+
+    return 'M ' + all.map(p => `${p.x} ${p.y}`).join(' L ') + ' Z';
+  }
 
   folds.forEach(fold => {
     const a = fold.angle;
-
-    // 横長の指先に合わせて、縦方向を少し圧縮
     const dx = Math.cos(a);
     const dy = Math.sin(a) * 0.88;
 
@@ -255,61 +286,77 @@ function drawWrinkles(x, y, amount) {
 
     const sx = x + dx * start;
     const sy = y + dy * start;
-
     const ex = x + dx * end;
     const ey = y + dy * end;
 
-    // 急に折れず、ゆったり曲がる
-    const c1x = x + dx * (start + (end - start) * 0.33)
+    const c1x = x + dx * (start + (end - start) * .33)
                   + nx * bend;
-    const c1y = y + dy * (start + (end - start) * 0.33)
+    const c1y = y + dy * (start + (end - start) * .33)
                   + ny * bend;
 
-    const c2x = x + dx * (start + (end - start) * 0.72)
-                  + nx * bend * 0.7;
-    const c2y = y + dy * (start + (end - start) * 0.72)
-                  + ny * bend * 0.7;
+    const c2x = x + dx * (start + (end - start) * .72)
+                  + nx * bend;
+    const c2y = y + dy * (start + (end - start) * .72)
+                  + ny * bend;
 
-    const d =
-      `M ${sx} ${sy}
-       C ${c1x} ${c1y},
-         ${c2x} ${c2y},
-         ${ex} ${ey}`;
+    // ベジェ曲線を細かく分割
+    const points = [];
 
-    // 布が寄った部分の柔らかい陰影
+    for (let i = 0; i <= 20; i++) {
+      const t = i / 20;
+      const mt = 1 - t;
+
+      points.push({
+        x: mt**3 * sx +
+           3 * mt**2 * t * c1x +
+           3 * mt * t**2 * c2x +
+           t**3 * ex,
+        y: mt**3 * sy +
+           3 * mt**2 * t * c1y +
+           3 * mt * t**2 * c2y +
+           t**3 * ey
+      });
+    }
+
+    // ① 幅のある柔らかい影
     const soft = document.createElementNS(NS, 'path');
-    soft.setAttribute('d', d);
-    soft.setAttribute('stroke', '#a96366');
-    soft.setAttribute('stroke-width', 8 * amount);
-    soft.setAttribute('stroke-opacity', 0.10 * amount);
+    soft.setAttribute(
+      'd',
+      taperedShape(points, 13, 8)
+    );
+    soft.setAttribute('fill', '#a96366');
+    soft.setAttribute('opacity', .12 * amount);
 
-    // シワの谷
+    // ② 折れ目の暗い谷
     const dark = document.createElementNS(NS, 'path');
-    dark.setAttribute('d', d);
-    dark.setAttribute('stroke', '#82484e');
-    dark.setAttribute('stroke-width', 2.1 * amount);
-    dark.setAttribute('stroke-opacity', 0.19 * amount);
+    dark.setAttribute(
+      'd',
+      taperedShape(points, 4.2, 2.4)
+    );
+    dark.setAttribute('fill', '#82484e');
+    dark.setAttribute('opacity', .20 * amount);
 
-    // 谷の隣にできる柔らかな光
-    const offset = 2.5;
-
-    const ld =
-      `M ${sx + nx * offset} ${sy + ny * offset}
-       C ${c1x + nx * offset} ${c1y + ny * offset},
-         ${c2x + nx * offset} ${c2y + ny * offset},
-         ${ex + nx * offset} ${ey + ny * offset}`;
-
+    // ③ 谷の隣に添える柔らかい光
     const light = document.createElementNS(NS, 'path');
-    light.setAttribute('d', ld);
-    light.setAttribute('stroke', '#fff1e9');
-    light.setAttribute('stroke-width', 1.6 * amount);
-    light.setAttribute('stroke-opacity', 0.25 * amount);
+
+    const lightPoints = points.map(p => ({
+      x: p.x + nx * 2.5,
+      y: p.y + ny * 2.5
+    }));
+
+    light.setAttribute(
+      'd',
+      taperedShape(lightPoints, 2.2, 1.6)
+    );
+    light.setAttribute('fill', '#fff1e9');
+    light.setAttribute('opacity', .28 * amount);
 
     wrinkles.appendChild(soft);
     wrinkles.appendChild(dark);
     wrinkles.appendChild(light);
   });
 }
+
 
   function updateVisual() {
     if (!point || depth <= 0.001) {
