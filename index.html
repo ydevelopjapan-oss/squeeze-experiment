@@ -164,7 +164,7 @@ button:active {
       <g id="dent" clip-path="url(#cushionClip)">
 
         <circle id="dentShade"
-          cx="150" cy="150" r="78"
+          cx="150" cy="150" rx="78" ry="70"
           fill="url(#dentGradient)"/>
 
         <g id="wrinkles"></g>
@@ -245,8 +245,8 @@ button:active {
 
     folds.forEach(fold => {
       const a = fold.angle;
-      const dx = Math.cos(a);
-      const dy = Math.sin(a);
+      const dx = Math.cos(a)*1.00;
+      const dy = Math.sin(a)*0.92;
 
       const nx = -dy;
       const ny = dx;
@@ -322,7 +322,8 @@ button:active {
 
     shade.setAttribute('cx', point.x);
     shade.setAttribute('cy', point.y);
-    shade.setAttribute('r', 38 + depth * 42);
+    shade.setAttribute('rx', 38 + depth * 42);
+    shade.setAttribute('ry', 35 + depth * 38);
 
     drawWrinkles(point.x, point.y, depth);
   }
