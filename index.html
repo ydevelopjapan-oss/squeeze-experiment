@@ -140,13 +140,6 @@ button:active {
           <stop offset=".85" stop-color="#b77b79" stop-opacity=".04"/>
           <stop offset="1" stop-color="#b77b79" stop-opacity="0"/>
         </radialGradient>
-        <radialGradient id="bulgeGradient">
-  <stop offset="0%" stop-color="#fff5ed" stop-opacity="0"/>
-  <stop offset="52%" stop-color="#fff5ed" stop-opacity="0"/>
-  <stop offset="68%" stop-color="#fff5ed" stop-opacity=".48"/>
-  <stop offset="82%" stop-color="#b66d70" stop-opacity=".13"/>
-  <stop offset="100%" stop-color="#b66d70" stop-opacity="0"/>
-</radialGradient>
 
         <filter id="shadow" x="-30%" y="-30%" width="170%" height="170%">
           <feDropShadow dx="3.3" dy="3.3"
@@ -168,15 +161,7 @@ button:active {
         rx="48"/>
 
       <g id="dent" clip-path="url(#cushionClip)">
-<ellipse
-  id="bulgeGlow"
-  cx="150"
-  cy="150"
-  rx="90"
-  ry="72"
-  fill="url(#bulgeGradient)"
-  opacity="0"
-/>
+
         <ellipse id="dentShade"
           cx="150" cy="150"
           rx="78" ry="70"
@@ -389,13 +374,6 @@ light.setAttribute('filter', 'url(#softBlur)');
     shade.setAttribute('cy', point.y);
     shade.setAttribute('rx', 38 + depth * 42);
     shade.setAttribute('ry', (35 + depth * 38) * 0.88);
-    const bulge = document.getElementById('bulgeGlow');
-
-bulge.setAttribute('cx', point.x);
-bulge.setAttribute('cy', point.y);
-bulge.setAttribute('rx', 48 + depth * 42);
-bulge.setAttribute('ry', (42 + depth * 34) * .88);
-bulge.style.opacity = String(depth);
 
     drawWrinkles(point.x, point.y, depth);
   }
