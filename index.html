@@ -321,19 +321,19 @@ function drawWrinkles(x, y, amount) {
     const soft = document.createElementNS(NS, 'path');
     soft.setAttribute(
       'd',
-      taperedShape(points, 13, 8)
+      taperedShape(points, 17, 9)
     );
     soft.setAttribute('fill', '#a96366');
-    soft.setAttribute('opacity', .12 * amount);
+    soft.setAttribute('opacity', .16 * amount);
 
     // ② 折れ目の暗い谷
     const dark = document.createElementNS(NS, 'path');
     dark.setAttribute(
       'd',
-      taperedShape(points, 4.2, 2.4)
+      taperedShape(points, 5.2, 2.8)
     );
     dark.setAttribute('fill', '#82484e');
-    dark.setAttribute('opacity', .20 * amount);
+    dark.setAttribute('opacity', .24 * amount);
 
     // ③ 谷の隣に添える柔らかい光
     const light = document.createElementNS(NS, 'path');
