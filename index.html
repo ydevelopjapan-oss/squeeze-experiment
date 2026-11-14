@@ -147,6 +147,9 @@ button:active {
             flood-color="#464b55"
             flood-opacity=".22"/>
         </filter>
+        <filter id="softBlur">
+  <feGaussianBlur stdDeviation="3"/>
+</filter>
 
         <clipPath id="cushionClip">
           <rect x="70" y="70" width="160" height="160" rx="48"/>
@@ -324,7 +327,8 @@ function drawWrinkles(x, y, amount) {
       taperedShape(points, 17, 9)
     );
     soft.setAttribute('fill', '#a96366');
-    soft.setAttribute('opacity', .16 * amount);
+    soft.setAttribute('opacity', .22 * amount);
+soft.setAttribute('filter', 'url(#softBlur)');
 
     // ② 折れ目の暗い谷
     const dark = document.createElementNS(NS, 'path');
@@ -333,7 +337,8 @@ function drawWrinkles(x, y, amount) {
       taperedShape(points, 5.2, 2.8)
     );
     dark.setAttribute('fill', '#82484e');
-    dark.setAttribute('opacity', .24 * amount);
+    dark.setAttribute('opacity', .18 * amount);
+dark.setAttribute('filter', 'url(#softBlur)');
 
     // ③ 谷の隣に添える柔らかい光
     const light = document.createElementNS(NS, 'path');
@@ -348,7 +353,8 @@ function drawWrinkles(x, y, amount) {
       taperedShape(lightPoints, 2.2, 1.6)
     );
     light.setAttribute('fill', '#fff1e9');
-    light.setAttribute('opacity', .28 * amount);
+    light.setAttribute('opacity', .20 * amount);
+light.setAttribute('filter', 'url(#softBlur)');
 
     wrinkles.appendChild(soft);
     wrinkles.appendChild(dark);
