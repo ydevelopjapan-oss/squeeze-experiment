@@ -222,100 +222,94 @@ button:active {
            p.y >= 70 && p.y <= 230;
   }
 
-  // 凹みの周囲に沿う、短い弧状のシワ
-  function drawWrinkles(x, y, amount) {
-    wrinkles.innerHTML = '';
+ 
+function drawWrinkles(x, y, amount) {
+  wrinkles.innerHTML = '';
 
-    const folds = [
-      { angle: -2.35, radius: 31, length: 17, curve: 5 },
-      { angle: -0.45, radius: 34, length: 19, curve: 6 },
-      { angle:  1.65, radius: 29, length: 16, curve: 5 }
-    ];
+  // 放射状に広がる8本のシワ
+  // 長さと角度は少しずつ不揃いにする
+  const folds = [
+    { angle: -2.0,  length: 49, bend:  3 },
+    { angle: -1.25, length: 43, bend: -3 },
+    { angle: -0.55, length: 57, bend:  4 },
+    { angle:  0.25, length: 46, bend: -3 },
+    { angle:  0.95, length: 55, bend:  3 },
+    { angle:  1.75, length: 44, bend: -4 },
+    { angle:  2.45, length: 53, bend:  3 },
+    { angle:  3.05, length: 45, bend: -3 }
+  ];
 
-    folds.forEach((fold, index) => {
-      // 深さに応じてシワを少しずつ増やす
-      const threshold = [0.18, 0.48, 0.76][index];
-      if (amount < threshold) return;
+  folds.forEach(fold => {
+    const a = fold.angle;
 
-      const strength = Math.min(
-        1,
-        (amount - threshold) / 0.35
-      );
+    // 横長の指先に合わせて、縦方向を少し圧縮
+    const dx = Math.cos(a);
+    const dy = Math.sin(a) * 0.88;
 
-      const a = fold.angle;
+    const nx = -dy;
+    const ny = dx;
 
-      // 指先の接触面を少し横長にする
-      let rx = Math.cos(a);
-      let ry = Math.sin(a) * 0.88;
+    const start = 19;
+    const end = fold.length;
+    const bend = fold.bend;
 
-      const len = Math.hypot(rx, ry);
-      rx /= len;
-      ry /= len;
+    const sx = x + dx * start;
+    const sy = y + dy * start;
 
-      const tx = -ry;
-      const ty = rx;
+    const ex = x + dx * end;
+    const ey = y + dy * end;
 
-      const cx = x + rx * fold.radius;
-      const cy = y + ry * fold.radius;
+    // 急に折れず、ゆったり曲がる
+    const c1x = x + dx * (start + (end - start) * 0.33)
+                  + nx * bend;
+    const c1y = y + dy * (start + (end - start) * 0.33)
+                  + ny * bend;
 
-      const half = fold.length / 2;
+    const c2x = x + dx * (start + (end - start) * 0.72)
+                  + nx * bend * 0.7;
+    const c2y = y + dy * (start + (end - start) * 0.72)
+                  + ny * bend * 0.7;
 
-      const sx = cx - tx * half;
-      const sy = cy - ty * half;
+    const d =
+      `M ${sx} ${sy}
+       C ${c1x} ${c1y},
+         ${c2x} ${c2y},
+         ${ex} ${ey}`;
 
-      const ex = cx + tx * half;
-      const ey = cy + ty * half;
+    // 布が寄った部分の柔らかい陰影
+    const soft = document.createElementNS(NS, 'path');
+    soft.setAttribute('d', d);
+    soft.setAttribute('stroke', '#a96366');
+    soft.setAttribute('stroke-width', 8 * amount);
+    soft.setAttribute('stroke-opacity', 0.10 * amount);
 
-      // シワの中央を凹み側へゆるく曲げる
-      const qx = cx - rx * fold.curve;
-      const qy = cy - ry * fold.curve;
+    // シワの谷
+    const dark = document.createElementNS(NS, 'path');
+    dark.setAttribute('d', d);
+    dark.setAttribute('stroke', '#82484e');
+    dark.setAttribute('stroke-width', 2.1 * amount);
+    dark.setAttribute('stroke-opacity', 0.19 * amount);
 
-      const d =
-        `M ${sx} ${sy}
-         Q ${qx} ${qy}
-           ${ex} ${ey}`;
+    // 谷の隣にできる柔らかな光
+    const offset = 2.5;
 
-      function addStroke(path, color, width, opacity) {
-        const el = document.createElementNS(NS, 'path');
-        el.setAttribute('d', path);
-        el.setAttribute('stroke', color);
-        el.setAttribute('stroke-width', width);
-        el.setAttribute('stroke-opacity', opacity);
-        wrinkles.appendChild(el);
-      }
+    const ld =
+      `M ${sx + nx * offset} ${sy + ny * offset}
+       C ${c1x + nx * offset} ${c1y + ny * offset},
+         ${c2x + nx * offset} ${c2y + ny * offset},
+         ${ex + nx * offset} ${ey + ny * offset}`;
 
-      // 柔らかい影
-      addStroke(
-        d,
-        '#a96366',
-        6 * amount,
-        .10 * strength
-      );
+    const light = document.createElementNS(NS, 'path');
+    light.setAttribute('d', ld);
+    light.setAttribute('stroke', '#fff1e9');
+    light.setAttribute('stroke-width', 1.6 * amount);
+    light.setAttribute('stroke-opacity', 0.25 * amount);
 
-      // シワの谷
-      addStroke(
-        d,
-        '#82484e',
-        2.0 * amount,
-        .20 * strength
-      );
-
-      // 少し外側にできる淡い光
-      const offset = 2.2;
-
-      const lightPath =
-        `M ${sx + rx * offset} ${sy + ry * offset}
-         Q ${qx + rx * offset} ${qy + ry * offset}
-           ${ex + rx * offset} ${ey + ry * offset}`;
-
-      addStroke(
-        lightPath,
-        '#fff1e9',
-        1.5 * amount,
-        .30 * strength
-      );
-    });
-  }
+    wrinkles.appendChild(soft);
+    wrinkles.appendChild(dark);
+    wrinkles.appendChild(light);
+  });
+}
 
   function updateVisual() {
     if (!point || depth <= 0.001) {
