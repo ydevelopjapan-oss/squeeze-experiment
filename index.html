@@ -184,7 +184,6 @@ button:active {
   const pad = document.getElementById('pad');
   const dent = document.getElementById('dent');
   const shade = document.getElementById('dentShade');
-  const rim = document.getElementById('dentRim');
   const wrinkles = document.getElementById('wrinkles');
   const hint = document.getElementById('hint');
   const reset = document.getElementById('reset');
@@ -324,10 +323,6 @@ button:active {
     shade.setAttribute('cx', point.x);
     shade.setAttribute('cy', point.y);
     shade.setAttribute('r', 38 + depth * 42);
-
-    rim.setAttribute('cx', point.x);
-    rim.setAttribute('cy', point.y);
-    rim.setAttribute('r', 48 + depth * 42);
 
     drawWrinkles(point.x, point.y, depth);
   }
