@@ -140,6 +140,17 @@ button:active {
           <stop offset=".85" stop-color="#b77b79" stop-opacity=".04"/>
           <stop offset="1" stop-color="#b77b79" stop-opacity="0"/>
         </radialGradient>
+        <radialGradient id="bulgeGradient">
+  <stop offset="0%" stop-color="#fff5ed" stop-opacity=".04"/>
+  <stop offset="35%" stop-color="#fff5ed" stop-opacity=".06"/>
+  <stop offset="65%" stop-color="#fff5ed" stop-opacity=".12"/>
+  <stop offset="88%" stop-color="#b66d70" stop-opacity=".06"/>
+  <stop offset="100%" stop-color="#b66d70" stop-opacity="0"/>
+</radialGradient>
+
+<filter id="bulgeBlur" x="-40%" y="-40%" width="180%" height="180%">
+  <feGaussianBlur stdDeviation="8"/>
+</filter>
 
         <filter id="shadow" x="-30%" y="-30%" width="170%" height="170%">
           <feDropShadow dx="3.3" dy="3.3"
@@ -162,7 +173,12 @@ button:active {
         rx="48"/>
 
       <g id="dent" clip-path="url(#cushionClip)">
-
+        <ellipse id="bulgeGlow"
+  cx="150" cy="150"
+  rx="90" ry="78"
+  fill="url(#bulgeGradient)"
+  filter="url(#bulgeBlur)"
+  opacity="0"/>
         <ellipse id="dentShade"
           cx="150" cy="150"
           rx="78" ry="70"
@@ -185,6 +201,7 @@ button:active {
   const pad = document.getElementById('pad');
   const dent = document.getElementById('dent');
   const shade = document.getElementById('dentShade');
+  const bulge = document.getElementById('bulgeGlow');
   const wrinkles = document.getElementById('wrinkles');
   const hint = document.getElementById('hint');
   const reset = document.getElementById('reset');
@@ -375,6 +392,11 @@ light.setAttribute('filter', 'url(#softBlur)');
     shade.setAttribute('cy', point.y);
     shade.setAttribute('rx', 38 + depth * 42);
     shade.setAttribute('ry', (35 + depth * 38) * 0.88);
+    bulge.setAttribute('cx', point.x);
+bulge.setAttribute('cy', point.y);
+bulge.setAttribute('rx', 70 + depth * 20);
+bulge.setAttribute('ry', (62 + depth * 16) * 0.88);
+bulge.style.opacity = String(depth);
 
     drawWrinkles(point.x, point.y, depth);
   }
