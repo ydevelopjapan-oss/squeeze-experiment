@@ -146,9 +146,8 @@ button:active {
             stdDeviation="3.8"
             flood-color="#464b55"
             flood-opacity=".22"/>
-        </filter>
-        <filter id="softBlur">
-  <feGaussianBlur stdDeviation="3"/>
+<filter id="softBlur" x="-40%" y="-100%" width="180%" height="300%">
+  <feGaussianBlur stdDeviation="4.5"/>
 </filter>
 
         <clipPath id="cushionClip">
@@ -230,13 +229,13 @@ function drawWrinkles(x, y, amount) {
   wrinkles.innerHTML = '';
 
   const folds = [
-    { angle: -2.05, length: 48, bend:  4 },
-    { angle: -1.05, length: 57, bend: -3 },
-    { angle: -0.12, length: 45, bend:  5 },
-    { angle:  0.82, length: 62, bend: -4 },
-    { angle:  1.82, length: 51, bend:  3 },
-    { angle:  2.75, length: 57, bend: -4 }
-  ];
+  { angle:-2.05, length:72, bend:4 },
+  { angle:-1.05, length:86, bend:-3 },
+  { angle:-0.12, length:68, bend:5 },
+  { angle:0.82, length:93, bend:-4 },
+  { angle:1.82, length:77, bend:3 },
+  { angle:2.75, length:86, bend:-4 }
+];
 
   // 曲線に沿って、根元から先端へ細くなる形を作る
   function taperedShape(points, startWidth, endWidth) {
